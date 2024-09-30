@@ -3,6 +3,7 @@ from app.database_conn import db
 from flask_migrate import Migrate
 from config import Config
 from app.boss_routes import boss_bp
+from app.main_routes import bp
 
 
 migrate = Migrate()
@@ -18,6 +19,7 @@ def create_app():
     migrate.init_app(app, db)
     
     # Register the Blueprint
+    app.register_blueprint(bp)
     app.register_blueprint(boss_bp)
     
     # Create the database tables
