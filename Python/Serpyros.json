@@ -1,0 +1,10 @@
+{
+    "name": "Serpyros",
+    "title": "the Algorithmic Serpent",
+    "language": "Python",
+    "difficulty": "Hard",
+    "specialty": "Data Structures & Algorithms",
+    "description": 
+                ["A serpent deity that governs the sacred realm of data structures and algorithmic rites.", 
+                "Only those who can efficiently solve his riddles shall escape his grasp."]
+}

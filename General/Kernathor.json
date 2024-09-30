@@ -1,0 +1,11 @@
+{
+    "name": "Kernathor",
+    "title": "the Rootlord",
+    "language": "General",
+    "difficulty": "Medium",
+    "specialty": "Linux",
+    "description": 
+                ["A powerful overseer of the Linux kernel and its mystical inner workings.", 
+                "Kernathor commands the deepest layers of the operating system, testing those who dare approach him on their knowledge of system calls, process management, and device control.",
+                "Only those who can wield root privileges with care and precision will survive his trials."]
+}

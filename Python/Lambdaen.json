@@ -1,0 +1,9 @@
+{
+    "name": "Lambdaen",
+    "title": "the Silent Caster",
+    "language": "Python",
+    "difficulty": "Medium",
+    "specialty": "Functions & Lambdas",
+    "description": ["A ghostly figure who speaks in whispers of lambda functions and recursive chants, demanding elegant solutions.",
+                    "Consider minimal code as tribute to pass through his trials."]
+}

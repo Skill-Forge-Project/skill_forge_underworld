@@ -1,0 +1,11 @@
+# Ignore python venv
+/skill_forge_underworld/
+
+# Ignore Obsidian dir
+.obsidian/
+
+# Ignore environment variables
+.env
+
+# Ignore pycache
+**/__pycache__/**
