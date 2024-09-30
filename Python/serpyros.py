@@ -1,9 +1,9 @@
-from openai_client import client
+from app.openai_client import client
 import json
 import random
 
 # Parse the JSON data
-with open('General/Kernathor.json') as f:
+with open('Python/Serpyros.json') as f:
     file_data = f.read()
     
 boss_data = json.loads(file_data)
