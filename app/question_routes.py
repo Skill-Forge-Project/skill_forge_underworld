@@ -12,6 +12,7 @@ from flask import request, jsonify
 def generate_new_question():
     if request.method == 'POST':
         data = request.get_json()
+        boss_id = data.get('boss_id')
         boss_name = data.get('boss_name')
         boss_language = data.get('boss_language')
         boss_difficulty = data.get('boss_difficulty')

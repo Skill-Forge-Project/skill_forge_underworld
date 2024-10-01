@@ -29,7 +29,27 @@ def create_new_boss():
             "error": "Failed to create boss",
             "details": str(e)
         }), 500
-        
+
+# Get boss by its ID
+@boss_bp.route('/get_boss', methods=['GET'])
+def get_boss():
+    data = request.get_json()
+    boss_id = data.get('boss_id')
+    boss = Boss.query.filter_by(boss_id=boss_id).first()
+    if boss:
+        return jsonify({
+            "boss_id": boss.boss_id,
+            "boss_name": boss.boss_name,
+            "boss_title": boss.boss_title,
+            "boss_language": boss.boss_language,
+            "boss_difficulty": boss.boss_difficulty,
+            "boss_specialty": boss.boss_specialty,
+            "boss_description": boss.boss_description
+        }), 200
+    else:
+        return jsonify({
+            "error": "Boss not found"}, 404)
+
 # Get all bosses
 @boss_bp.route('/get_all_bosses', methods=['GET'])
 def get_all_bosses():
