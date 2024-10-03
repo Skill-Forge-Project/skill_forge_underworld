@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from app.openai_client import client
-import json
+from app.models import Boss, Challenge
 
 
 # Create a Blueprint for the question routes
@@ -19,6 +19,14 @@ def generate_new_question():
         boss_difficulty = data.get('boss_difficulty')
         boss_specialty = data.get('boss_specialty')
         boss_description = data.get('boss_description')
+        user_id = data.get('user_id')
+        user_name = data.get('user_name')
+        
+        print(data)
+        # Fetch the Boss instance from the database using boss_id
+        boss = Boss.query.filter_by(boss_id=boss_id).first()
+        if not boss:
+            return jsonify({"error": "Boss not found."}), 404
         
         # Generate a new question for the user with OpenAI
         prompt = f"You are {boss_name}, a boss specializing in {boss_language} {boss_specialty} with {boss_difficulty} as the tech stack."
@@ -32,8 +40,12 @@ def generate_new_question():
             {"role": "user", "content": prompt}
         ])
         
-        evaluation = response.choices[0].message.content
-        return jsonify({"question": evaluation.strip()}), 201
+        # Create new Challenge record in the database
+        challenge = Challenge(boss_id=boss.boss_id, user_id=user_id, user_name=user_name)
+        challenge.create_challenge()
+                
+        challenge = response.choices[0].message.content
+        return jsonify({"question": challenge.strip()}), 201
     
     elif request.method == 'GET':
         # Optionally, return a message or instructions for GET requests

@@ -56,33 +56,42 @@ class Boss(db.Model):
 # Underworld Challenge Class
 class Challenge(db.Model):
     __tablename__ = 'underworld_challenges'
-    challenge_id = db.Column(db.String(11), primary_key=True, nullable=False)
+    challenge_id = db.Column(db.String(20), primary_key=True, nullable=False)
     boss_id = db.Column(db.String(11), db.ForeignKey('underworld_bosses.boss_id'), nullable=False)
     # Relationship with Boss Class
     boss_name = relationship("Boss", back_populates="challenges")
     user_id = db.Column(db.String(11), nullable=False)
     user_name = db.Column(db.String(50), nullable=False)
     challenge_date = db.Column(db.DateTime, default=datetime.now())
-    state = db.Column(Enum('In Progress', 'Finished', name='challenge_state'), nullable=False)
+    state = db.Column(Enum('In Progress', 'Finished', name='challenge_state'), default='User', nullable=False)
     
     # Class Constructor
-    def __init__(self, challenge_id, boss_id, boss_name, user_id, user_name, state):
-        self.challenge_id = challenge_id
+    def __init__(self, boss_id, user_id, user_name):
+        self.challenge_id = self.generate_challenge_id()
         self.boss_id = boss_id
-        self.boss_name = boss_name
         self.user_id = user_id
         self.user_name = user_name
-        self.state = state
+        self.state = 'In Progress'
     
     # Generate Challenge ID
     def generate_challenge_id(self):
         # Generate a unique challenge ID in the format CHALLENGE-XXXXXX
         while True:
             challenge_id = f'CHALLENGE-{random.randint(100000, 999999)}'
-            if not Challenge.query.filter_by(challenge_id=challenge_id).first():  # Ensure uniqueness
+            if not Challenge.query.filter_by(challenge_id=challenge_id).first():
                 return challenge_id
     
     # Save the challenge to the database
     def create_challenge(self):
         db.session.add(self)
         db.session.commit()
+
+    # Finish Challenge
+    @classmethod
+    def finish_challenge(cls, challenge_id):
+        challenge = cls.query.filter_by(challenge_id=challenge_id).first()
+        if challenge:
+            challenge.state = 'Finished'
+            db.session.commit()
+        else:
+            print(f"Challenge with ID {challenge_id} not found.")
