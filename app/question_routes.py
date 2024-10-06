@@ -34,7 +34,7 @@ def generate_new_question():
         prompt += f"Generate a question for user to answer in your specialty: {boss_language} {boss_specialty} on {boss_difficulty} difficulty."
         prompt += "Add to the question just a little bit of your own flair."
 
-        response = client.chat.completions.create(model="gpt-4",
+        response = client.chat.completions.create(model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an AI that generates questions for users."},
             {"role": "user", "content": prompt}
@@ -78,7 +78,7 @@ def evaluate_user_answer():
         prompt += "The XP points should be in the range of 0 to 100 for Easy, 101 to 250 for Medium, 251 to 500 for Hard."
         prompt += "All want to get the response in the following format: {'evaluation': <evaluation>, 'feedback': <feedback>, 'xp_points': <xp_points>}"
 
-        response = client.chat.completions.create(model="gpt-4",
+        response = client.chat.completions.create(model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an AI that evaluates user answers."},
             {"role": "user", "content": prompt}
