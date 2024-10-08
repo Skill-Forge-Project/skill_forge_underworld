@@ -21,17 +21,20 @@ def generate_new_question():
         boss_description = data.get('boss_description')
         user_id = data.get('user_id')
         user_name = data.get('user_name')
-        
-        print(data)
         # Fetch the Boss instance from the database using boss_id
         boss = Boss.query.filter_by(boss_id=boss_id).first()
         if not boss:
             return jsonify({"error": "Boss not found."}), 404
         
+        with open('./quest_examples.txt', 'r') as f:
+            example = f.read()
+        
         # Generate a new question for the user with OpenAI
         prompt = f"You are {boss_name}, a boss specializing in {boss_language} {boss_specialty} with {boss_difficulty} as the tech stack."
         prompt += f"Your description is: {boss_description}."
         prompt += f"Generate a question for user to answer in your specialty: {boss_language} {boss_specialty} on {boss_difficulty} difficulty."
+        # prompt += "If you need to write a code in the question, write it separately so I can take it with regex and put it in a code block."
+        prompt += f"Here is a perfect example of a question: {example}"
         prompt += "Add to the question just a little bit of your own flair."
 
         response = client.chat.completions.create(model="gpt-4o",
@@ -39,6 +42,8 @@ def generate_new_question():
             {"role": "system", "content": "You are an AI that generates questions for users."},
             {"role": "user", "content": prompt}
         ])
+        
+        print(response)
         
         # Create new Challenge record in the database
         challenge = Challenge(boss_id=boss.boss_id, user_id=user_id, user_name=user_name)

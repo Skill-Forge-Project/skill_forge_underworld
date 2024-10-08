@@ -1,0 +1,9 @@
+Here should be your question! Ask the user something related to your Language, Specialty and DIfficulty. If the question is too easy, DO NOT write code example!
+
+Below you(the boss) should place any code that is required for the task
+Keep in mind, DO NOT make it too easy for the user, if there is any code generated for the challenge reveal just a small portion of it.
+The rest should be solved by the user. 
+
+```python
+
+```
