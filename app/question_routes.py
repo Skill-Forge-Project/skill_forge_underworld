@@ -43,8 +43,6 @@ def generate_new_question():
             {"role": "user", "content": prompt}
         ])
         
-        print(response)
-        
         # Create new Challenge record in the database
         challenge = Challenge(boss_id=boss.boss_id, user_id=user_id, user_name=user_name)
         challenge.create_challenge()
