@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 bp = Blueprint('main', __name__)
 
 # Check the status of the Underworld Realm
-@bp.route('/')
+@bp.route('/', methods=['GET'])
 def underworld_status():
     allowed_ip = os.getenv('ALLOWED_IP')
     if request.remote_addr != allowed_ip:

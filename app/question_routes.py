@@ -44,14 +44,15 @@ def generate_new_question():
         ])
         
         # Create new Challenge record in the database
-        challenge = Challenge(boss_id=boss.boss_id, user_id=user_id, user_name=user_name)
-        challenge.create_challenge()
-                
+        new_challenge = Challenge(boss_id=boss.boss_id, user_id=user_id, user_name=user_name)
+        new_challenge.create_challenge()
+
         challenge = response.choices[0].message.content
-        return jsonify({"question": challenge.strip()}), 201
+        challenge_id = new_challenge.challenge_id
+        return jsonify({"question": challenge.strip(), "challenge_id": challenge_id}), 201
     
     elif request.method == 'GET':
-        # Optionally, return a message or instructions for GET requests
+        # Return a message or instructions for GET requests
         return jsonify({"message": "New Question Generated!"}), 200
 
 # Evaluate user's answer
@@ -93,3 +94,16 @@ def evaluate_user_answer():
     elif request.method == 'GET':
         # Optionally, return a message or instructions for GET requests
         return jsonify({"message": "User Answer Evaluated"}), 200
+
+
+# Update Challenge status to Failed
+@qst_bp.route('/update_challenge_fail', methods=['POST'])
+def fail_challenge():
+    data = request.get_json()
+    challenge_id = data.get('challenge_id')
+    challenge = Challenge.query.filter_by(challenge_id=challenge_id).first()
+    if challenge:
+        challenge.fail_challenge(challenge.challenge_id)
+        return jsonify({"message": "Challenge Finished!"}), 201
+    else:
+        return jsonify({"error": "Challenge not found."}), 404

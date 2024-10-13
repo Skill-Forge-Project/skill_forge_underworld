@@ -15,6 +15,7 @@ class Boss(db.Model):
     boss_difficulty = db.Column(db.String(50), nullable=False)
     boss_specialty = db.Column(db.String(50), nullable=False)
     boss_description = db.Column(db.Text, nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.now())
     
     # Relationship with Challenge Class
     challenges = relationship('Challenge', back_populates='boss_name')
@@ -63,7 +64,7 @@ class Challenge(db.Model):
     user_id = db.Column(db.String(11), nullable=False)
     user_name = db.Column(db.String(50), nullable=False)
     challenge_date = db.Column(db.DateTime, default=datetime.now())
-    state = db.Column(Enum('In Progress', 'Finished', name='challenge_state'), default='User', nullable=False)
+    state = db.Column(Enum('In Progress', 'Finished', 'Failed', name='challenge_state'), default='In Progress', nullable=False)
     
     # Class Constructor
     def __init__(self, boss_id, user_id, user_name):
@@ -77,7 +78,7 @@ class Challenge(db.Model):
     def generate_challenge_id(self):
         # Generate a unique challenge ID in the format CHALLENGE-XXXXXX
         while True:
-            challenge_id = f'CHALLENGE-{random.randint(100000, 999999)}'
+            challenge_id = f'CHALLENGE-{random.randint(1000000000, 9999999999)}'
             if not Challenge.query.filter_by(challenge_id=challenge_id).first():
                 return challenge_id
     
@@ -92,6 +93,16 @@ class Challenge(db.Model):
         challenge = cls.query.filter_by(challenge_id=challenge_id).first()
         if challenge:
             challenge.state = 'Finished'
+            db.session.commit()
+        else:
+            print(f"Challenge with ID {challenge_id} not found.")
+    
+    # Fail Challenge(if the Skill Forge timer is over)
+    @classmethod
+    def fail_challenge(cls, challenge_id):
+        challenge = cls.query.filter_by(challenge_id=challenge_id).first()
+        if challenge:
+            challenge.state = 'Failed'
             db.session.commit()
         else:
             print(f"Challenge with ID {challenge_id} not found.")
