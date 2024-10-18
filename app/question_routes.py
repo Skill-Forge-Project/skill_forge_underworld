@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint,  request, jsonify
 from app.openai_client import client
 from app.models import Boss, Challenge
@@ -55,6 +56,22 @@ def generate_new_question():
         # Return a message or instructions for GET requests
         return jsonify({"message": "New Question Generated!"}), 200
 
+# Check if user has an active challenge (last 24h for specific boss)
+@qst_bp.route('/check_active_challenge', methods=['GET'])
+def check_active_challenge():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    boss_id = data.get('boss_id')
+    
+    # Check if the user has an active challenge with the specific boss (today)
+    challenge = Challenge.query.filter_by(user_id=user_id, boss_id=boss_id).first()
+    if challenge:
+        if challenge.challenge_date.date() == datetime.now().date():
+            return jsonify({"message": "Challenge Found!"}), 200
+    else:
+        return jsonify({"message": "No Challenge Found!"}), 404
+
+
 # Evaluate user's answer
 @qst_bp.route('/evaluate_user_answer', methods=['GET', 'POST'])
 def evaluate_user_answer():
@@ -94,7 +111,6 @@ def evaluate_user_answer():
     elif request.method == 'GET':
         # Optionally, return a message or instructions for GET requests
         return jsonify({"message": "User Answer Evaluated"}), 200
-
 
 # Update Challenge status to Failed
 @qst_bp.route('/update_challenge_fail', methods=['POST'])

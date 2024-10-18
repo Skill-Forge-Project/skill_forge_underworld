@@ -8,7 +8,6 @@ bp = Blueprint('main', __name__)
 @bp.route('/', methods=['GET'])
 def underworld_status():
     allowed_ips = os.getenv('ALLOWED_IPs', '').split(',')
-    print(allowed_ips)
     if request.remote_addr not in allowed_ips:
         return jsonify({"error": "Unauthorized access"}), 403
     return jsonify({"message": "Underworld Realm is running!"}), 200
