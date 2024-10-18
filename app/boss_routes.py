@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, request, jsonify
 from app.models import Boss
 
 # Create a Blueprint for the boss routes

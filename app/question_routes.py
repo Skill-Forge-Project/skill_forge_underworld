@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint,  request, jsonify
 from app.openai_client import client
 from app.models import Boss, Challenge
 
