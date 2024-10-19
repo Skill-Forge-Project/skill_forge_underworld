@@ -64,11 +64,13 @@ def check_active_challenge():
     boss_id = data.get('boss_id')
     
     # Check if the user has an active challenge with the specific boss (today)
-    challenge = Challenge.query.filter_by(user_id=user_id, boss_id=boss_id).first()
-    if challenge:
+    try:
+        challenge = Challenge.query.filter_by(user_id=user_id, boss_id=boss_id).first()
         if challenge.challenge_date.date() == datetime.now().date():
             return jsonify({"message": "Challenge Found!"}), 200
-    else:
+        else:
+            return jsonify({"message": "No Challenge Found!"}), 404
+    except:
         return jsonify({"message": "No Challenge Found!"}), 404
 
 
