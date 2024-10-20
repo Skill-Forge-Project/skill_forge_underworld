@@ -52,7 +52,8 @@ Example Boss:
 	"boss_language": "C#", 
 	"boss_difficulty": "Hard", 
 	"boss_specialty": "Memory Management & Exception Handling",
-	"boss_description": "A powerful wielder of garbage collection  and defensive coding techniques, vanquishing bugs and memory leaks." }
+	"boss_description": "A powerful wielder of garbage collection  and defensive coding techniques, vanquishing bugs and memory leaks."
+}
 ```
 
 ## 5. Contributing 👨‍💻👩‍💻
