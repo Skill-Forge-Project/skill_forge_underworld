@@ -132,12 +132,14 @@ class Evaluation(db.Model):
     user_code = db.Column(db.Text, nullable=True)
     evaluation_result = db.Column(db.String(20), nullable=False)
     evaluation_feedback = db.Column(db.Text, nullable=False)
+    evaluation_xp = db.Column(db.Integer, nullable=True)
     evaluation_date = db.Column(db.DateTime, default=datetime.now())
 
     # Class Constructor
-    def __init__(self, challenge_id, user_id, user_name, challenge_given, user_answer, user_code, evaluation_result, evaluation_feedback):
+    def __init__(self, challenge_id, boss_id, user_id, user_name, challenge_given, user_answer, user_code, evaluation_result, evaluation_feedback, evaluation_xp=evaluation_xp):
         self.evaluation_id = self.generate_evaluation_id()
         self.challenge_id = challenge_id
+        self.boss_id = boss_id
         self.user_id = user_id
         self.user_name = user_name
         self.challenge_given = challenge_given
@@ -145,6 +147,7 @@ class Evaluation(db.Model):
         self.user_code = user_code
         self.evaluation_result = evaluation_result
         self.evaluation_feedback = evaluation_feedback
+        self.evaluation_xp = evaluation_xp
     
     # Generate Evaluation ID
     def generate_evaluation_id(self):

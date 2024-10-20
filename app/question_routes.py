@@ -1,7 +1,8 @@
+import re, ast
 from datetime import datetime
 from flask import Blueprint,  request, jsonify
 from app.openai_client import client
-from app.models import Boss, Challenge
+from app.models import Boss, Challenge, Evaluation
 
 
 # Create a Blueprint for the question routes
@@ -75,44 +76,62 @@ def check_active_challenge():
 
 
 # Evaluate user's answer
-@qst_bp.route('/evaluate_user_answer', methods=['GET', 'POST'])
+@qst_bp.route('/evaluate_user_answer', methods=['POST'])
 def evaluate_user_answer():
-    if request.method == 'POST':
-        data = request.get_json()
-        boss_question = data.get('boss_question')
-        user_answer = data.get('user_answer')
-        user_code_answer = data.get('user_code_answer')
-        boss_id = data.get('boss_id')
-        boss_name = data.get('boss_name')
-        boss_language = data.get('boss_language')
-        boss_difficulty = data.get('boss_difficulty')
-        boss_specialty = data.get('boss_specialty')
-        boss_description = data.get('boss_description')
-        
-        # Evaluate the user's answer with OpenAI
-        prompt = f"You are {boss_name}, a boss specializing in {boss_language} {boss_specialty} with {boss_difficulty} as the tech stack."
-        prompt += f"Your description is: {boss_description}."
-        prompt += f"Here is the question you generated: {boss_question}."
-        prompt += f"Here is the user's answer: {user_answer}."
-        prompt += f"Here is the user's code snippet: {user_code_answer}."
-        prompt += "Evaluate the user's answer. The user's answer should be evaluated based on the question you generated and must the one of the following - Poor, Satisfactory, Good, Excellent and must contain just one word of the specified."
-        prompt += "Also, separatly give the user's a short feedback and make the feedback related to your own flair.It is very important that the feedback text string does not contain any special characters or single quotes."
-        prompt += f"Give the user's XP points based on the your difficulty - {boss_difficulty} and on the evaluation of the user's answer."
-        prompt += "The XP points should be in the range of 0 to 100 for Easy, 101 to 250 for Medium, 251 to 500 for Hard."
-        prompt += "All want to get the response in the following format: {'evaluation': <evaluation>, 'feedback': <feedback>, 'xp_points': <xp_points>}"
-
-        response = client.chat.completions.create(model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are an AI that evaluates user answers."},
-            {"role": "user", "content": prompt}
-        ])
-        
-        evaluation = response.choices[0].message.content
-        return jsonify(evaluation.strip()), 201
+    data = request.get_json()
+    challenge_id = data.get('challenge_id')
+    user_id = data.get('user_id')
+    user_name = data.get('user_name')
+    boss_question = data.get('boss_question')
+    user_answer = data.get('user_answer')
+    user_code_answer = data.get('user_code_answer')
+    boss_id = data.get('boss_id')
+    boss_name = data.get('boss_name')
+    boss_language = data.get('boss_language')
+    boss_difficulty = data.get('boss_difficulty')
+    boss_specialty = data.get('boss_specialty')
+    boss_description = data.get('boss_description')
     
-    elif request.method == 'GET':
-        # Optionally, return a message or instructions for GET requests
-        return jsonify({"message": "User Answer Evaluated"}), 200
+    # Evaluate the user's answer with OpenAI
+    prompt = f"You are {boss_name}, a boss specializing in {boss_language} {boss_specialty} with {boss_difficulty} as the tech stack."
+    prompt += f"Your description is: {boss_description}."
+    prompt += f"Here is the question you generated: {boss_question}."
+    prompt += f"Here is the user's answer: {user_answer}."
+    prompt += f"Here is the user's code snippet: {user_code_answer}."
+    prompt += "Evaluate the user's answer. The user's answer should be evaluated based on the question you generated and must the one of the following - Poor, Satisfactory, Good, Excellent and must contain just one word of the specified."
+    prompt += "Also, separatly give the user's a short feedback and make the feedback related to your own flair.It is very important that the feedback text string does not contain any special characters or single quotes."
+    prompt += f"Give the user's XP points based on the your difficulty - {boss_difficulty} and on the evaluation of the user's answer."
+    prompt += "The XP points should be in the range of 0 to 100 for Easy, 101 to 250 for Medium, 251 to 500 for Hard."
+    prompt += "All want to get the response in the following format: {'evaluation': <evaluation>, 'feedback': <feedback>, 'xp_points': <xp_points>}"
+    
+    response = client.chat.completions.create(model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "You are an AI that evaluates user answers."},
+        {"role": "user", "content": prompt}
+    ])
+            
+    evaluation = response.choices[0].message.content
+    evaluation_dict = evaluation.replace("\'", "\"")
+    # Create a new Evaluation record in the database
+    try:
+        evaluation_dict = ast.literal_eval(evaluation_dict)
+        new_evaluation = Evaluation(challenge_id=challenge_id,
+                                                                user_id=user_id, 
+                                                                user_name=user_name, 
+                                                                boss_id=boss_id, 
+                                                                challenge_given=boss_question,
+                                                                user_answer=user_answer,
+                                                                user_code=user_code_answer,
+                                                                evaluation_result=evaluation_dict["evaluation"], 
+                                                                evaluation_feedback=evaluation_dict["feedback"],
+                                                                evaluation_xp=evaluation_dict["xp_points"])
+        Evaluation.create_evaluation(new_evaluation)
+    except Exception as e:
+        print(e)
+        return jsonify({"error": f"Error: {e}"}), 500
+        
+    # Return the evaluation result to Skill Forge
+    return jsonify(evaluation.strip()), 201
 
 # Update Challenge status to Failed
 @qst_bp.route('/update_challenge_fail', methods=['POST'])
