@@ -16,9 +16,11 @@ class Boss(db.Model):
     boss_specialty = db.Column(db.String(50), nullable=False)
     boss_description = db.Column(db.Text, nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.now())
-    
+
     # Relationship with Challenge Class
     challenges = relationship('Challenge', back_populates='boss_name')
+    # Relationship with Evaluation Class
+    evaluations = relationship('Evaluation', back_populates='boss')
     
     # Class Constructor
     def __init__(self, boss_name, boss_title, boss_language, boss_difficulty, boss_specialty, boss_description):
@@ -59,12 +61,15 @@ class Challenge(db.Model):
     __tablename__ = 'underworld_challenges'
     challenge_id = db.Column(db.String(20), primary_key=True, nullable=False)
     boss_id = db.Column(db.String(11), db.ForeignKey('underworld_bosses.boss_id'), nullable=False)
-    # Relationship with Boss Class
-    boss_name = relationship("Boss", back_populates="challenges")
     user_id = db.Column(db.String(11), nullable=False)
     user_name = db.Column(db.String(50), nullable=False)
     challenge_date = db.Column(db.DateTime, default=datetime.now())
     state = db.Column(Enum('In Progress', 'Finished', 'Failed', name='challenge_state'), default='In Progress', nullable=False)
+    
+    # Relationship with Boss Class
+    boss_name = relationship("Boss", back_populates="challenges")
+    # Relationship with Evaluation Class
+    evaluations = relationship('Evaluation', back_populates='challenge')
     
     # Class Constructor
     def __init__(self, boss_id, user_id, user_name):
@@ -106,3 +111,50 @@ class Challenge(db.Model):
             db.session.commit()
         else:
             print(f"Challenge with ID {challenge_id} not found.")
+
+
+# Underworld Evaluation Class (stores all evaluations for challenges)
+class Evaluation(db.Model):
+    __tablename__ = 'underworld_evaluations'
+    evaluation_id = db.Column(db.String(20), primary_key=True, nullable=False)
+    # ForeignKey for Challenge
+    challenge_id = db.Column(db.String(20), db.ForeignKey('underworld_challenges.challenge_id'), nullable=False)
+    # Relationship with Challenge
+    challenge = relationship("Challenge", back_populates="evaluations")
+    # ForeignKey for Boss
+    boss_id = db.Column(db.String(11), db.ForeignKey('underworld_bosses.boss_id'), nullable=False)
+    # Relationship with Boss
+    boss = relationship("Boss", back_populates="evaluations")
+    user_id = db.Column(db.String(11), nullable=False)
+    user_name = db.Column(db.String(50), nullable=False)
+    challenge_given = db.Column(db.Text, nullable=False)
+    user_answer = db.Column(db.Text, nullable=False)
+    user_code = db.Column(db.Text, nullable=True)
+    evaluation_result = db.Column(db.String(20), nullable=False)
+    evaluation_feedback = db.Column(db.Text, nullable=False)
+    evaluation_date = db.Column(db.DateTime, default=datetime.now())
+
+    # Class Constructor
+    def __init__(self, challenge_id, user_id, user_name, challenge_given, user_answer, user_code, evaluation_result, evaluation_feedback):
+        self.evaluation_id = self.generate_evaluation_id()
+        self.challenge_id = challenge_id
+        self.user_id = user_id
+        self.user_name = user_name
+        self.challenge_given = challenge_given
+        self.user_answer = user_answer
+        self.user_code = user_code
+        self.evaluation_result = evaluation_result
+        self.evaluation_feedback = evaluation_feedback
+    
+    # Generate Evaluation ID
+    def generate_evaluation_id(self):
+        # Generate a unique evaluation ID in the format EVAL-XXXXXX
+        while True:
+            evaluation_id = f'EVAL-{random.randint(1000000000, 9999999999)}'
+            if not Evaluation.query.filter_by(evaluation_id=evaluation_id).first():
+                return evaluation_id
+
+    # Save the evaluation to the database
+    def create_evaluation(self):
+        db.session.add(self)
+        db.session.commit()
