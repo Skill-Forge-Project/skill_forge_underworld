@@ -15,7 +15,7 @@ class Boss(db.Model):
     boss_difficulty = db.Column(db.String(50), nullable=False)
     boss_specialty = db.Column(db.String(50), nullable=False)
     boss_description = db.Column(db.Text, nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.now())
+    date_created = db.Column(db.DateTime, nullable=False)
 
     # Relationship with Challenge Class
     challenges = relationship('Challenge', back_populates='boss_name')
@@ -31,6 +31,7 @@ class Boss(db.Model):
         self.boss_difficulty = boss_difficulty
         self.boss_specialty = boss_specialty
         self.boss_description = boss_description
+        self.date_created = datetime.now()
     
     # Generate Boss ID
     def generate_boss_id(self):
@@ -63,7 +64,7 @@ class Challenge(db.Model):
     boss_id = db.Column(db.String(11), db.ForeignKey('underworld_bosses.boss_id'), nullable=False)
     user_id = db.Column(db.String(11), nullable=False)
     user_name = db.Column(db.String(50), nullable=False)
-    challenge_date = db.Column(db.DateTime, default=datetime.now())
+    challenge_date = db.Column(db.DateTime, nullable=False)
     state = db.Column(Enum('In Progress', 'Finished', 'Failed', name='challenge_state'), default='In Progress', nullable=False)
     
     # Relationship with Boss Class
@@ -77,6 +78,7 @@ class Challenge(db.Model):
         self.boss_id = boss_id
         self.user_id = user_id
         self.user_name = user_name
+        self.challenge_date = datetime.now()
         self.state = 'In Progress'
     
     # Generate Challenge ID
@@ -133,7 +135,7 @@ class Evaluation(db.Model):
     evaluation_result = db.Column(db.String(20), nullable=False)
     evaluation_feedback = db.Column(db.Text, nullable=False)
     evaluation_xp = db.Column(db.Integer, nullable=True)
-    evaluation_date = db.Column(db.DateTime, default=datetime.now())
+    evaluation_date = db.Column(db.DateTime, nullable=False)
 
     # Class Constructor
     def __init__(self, challenge_id, boss_id, user_id, user_name, challenge_given, user_answer, user_code, evaluation_result, evaluation_feedback, evaluation_xp=evaluation_xp):
@@ -148,6 +150,7 @@ class Evaluation(db.Model):
         self.evaluation_result = evaluation_result
         self.evaluation_feedback = evaluation_feedback
         self.evaluation_xp = evaluation_xp
+        self.evaluation_date = datetime.now()
     
     # Generate Evaluation ID
     def generate_evaluation_id(self):

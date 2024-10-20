@@ -74,10 +74,9 @@ def check_active_challenge():
     except AttributeError:
         return jsonify({"message": "No Active Challenge Found!"}), 404
 
-
 # Evaluate user's answer
 @qst_bp.route('/evaluate_user_answer', methods=['POST'])
-def evaluate_user_answer():
+def evaluate_user_answer():    
     data = request.get_json()
     challenge_id = data.get('challenge_id')
     user_id = data.get('user_id')
@@ -91,6 +90,12 @@ def evaluate_user_answer():
     boss_difficulty = data.get('boss_difficulty')
     boss_specialty = data.get('boss_specialty')
     boss_description = data.get('boss_description')
+
+    # Check if the user has an active evaluation (today). Prevents multiple evaluations for the same challenge from the user by going back to the same boss
+        # after the user has already been evaluated for the same boss on the same day.
+    is_active_evaluation = Evaluation.query.filter_by(user_id=user_id, boss_id=boss_id).first()
+    if is_active_evaluation and is_active_evaluation.evaluation_date.date() == datetime.now().date():
+        return jsonify({"error": "You have already challenged this boss! Try again tommorow."}), 400
     
     # Evaluate the user's answer with OpenAI
     prompt = f"You are {boss_name}, a boss specializing in {boss_language} {boss_specialty} with {boss_difficulty} as the tech stack."
@@ -111,7 +116,9 @@ def evaluate_user_answer():
     ])
             
     evaluation = response.choices[0].message.content
+    # Transform the evaluation string into a dictionary
     evaluation_dict = evaluation.replace("\'", "\"")
+    
     # Create a new Evaluation record in the database
     try:
         evaluation_dict = ast.literal_eval(evaluation_dict)
