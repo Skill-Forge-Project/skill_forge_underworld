@@ -147,19 +147,14 @@ def evaluate_user_answer():
     
     # Check if the user should receive an achievement for the challenge, evaluation must be Excellent
     if evaluation_dict["evaluation"] == "Excellent":
-        print(f'Check if the user should receive an achievement for the challenge: {evaluation_dict["evaluation"]}')
         # Check if the user has already Excellent evaluation and give him the Master of the Underworld achievements (Underworld Conqueror)
         count_excellent_evaluations = Evaluation.query.filter_by(user_id=user_id,  evaluation_result="Excellent").count()
-        print(f'Count Excellent Evaluations: {count_excellent_evaluations}')
         if count_excellent_evaluations == 1:
             evaluation_dict["underworld_achievement"] = True
-            print(f'Underworld Achievement:  {evaluation_dict["underworld_achievement"]}')
         # Check if the user has already Excellent evaluation for the same boss and give him Underworld achievement (for the specific boss)
         excellent_evaluations = Evaluation.query.filter_by(user_id=user_id, boss_id=boss_id, evaluation_result="Excellent").count()
-        print(f'Excellent Evaluations:  {excellent_evaluations}')
         if excellent_evaluations == 1:
             evaluation_dict["boss_achievement"] = True
-            print(f'Boss Achievement:  {evaluation_dict["boss_achievement"]}')
 
         
     # Return the evaluation result to Skill Forge
