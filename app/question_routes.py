@@ -1,6 +1,6 @@
 import re, ast
 from datetime import datetime
-from flask import Blueprint,  request, jsonify
+from flask import Blueprint,  request, jsonify, redirect, url_for
 from app.openai_client import client
 from app.models import Boss, Challenge, Evaluation
 
@@ -118,10 +118,9 @@ def evaluate_user_answer():
     evaluation = response.choices[0].message.content
     # Transform the evaluation string into a dictionary
     evaluation_dict = evaluation.replace("\'", "\"")
-    
+    evaluation_dict = eval(evaluation_dict)
     # Create a new Evaluation record in the database
     try:
-        evaluation_dict = ast.literal_eval(evaluation_dict)
         new_evaluation = Evaluation(challenge_id=challenge_id,
                                                                 user_id=user_id, 
                                                                 user_name=user_name, 
@@ -136,9 +135,35 @@ def evaluate_user_answer():
     except Exception as e:
         print(e)
         return jsonify({"error": f"Error: {e}"}), 500
+    
+    # Add additional fields to the evaluation_dict
+    evaluation_dict["underworld_achievement"] = False
+    evaluation_dict["boss_achievement"] = False
+    evaluation_dict["user_id"] = user_id
+    evaluation_dict["boss"] = boss_name
+    
+    # Update the Challenge status to Finished
+    Challenge.finish_challenge(challenge_id)
+    
+    # Check if the user should receive an achievement for the challenge, evaluation must be Excellent
+    if evaluation_dict["evaluation"] == "Excellent":
+        print(f'Check if the user should receive an achievement for the challenge: {evaluation_dict["evaluation"]}')
+        # Check if the user has already Excellent evaluation and give him the Master of the Underworld achievements (Underworld Conqueror)
+        count_excellent_evaluations = Evaluation.query.filter_by(user_id=user_id,  evaluation_result="Excellent").count()
+        print(f'Count Excellent Evaluations: {count_excellent_evaluations}')
+        if count_excellent_evaluations == 1:
+            evaluation_dict["underworld_achievement"] = True
+            print(f'Underworld Achievement:  {evaluation_dict["underworld_achievement"]}')
+        # Check if the user has already Excellent evaluation for the same boss and give him Underworld achievement (for the specific boss)
+        excellent_evaluations = Evaluation.query.filter_by(user_id=user_id, boss_id=boss_id, evaluation_result="Excellent").count()
+        print(f'Excellent Evaluations:  {excellent_evaluations}')
+        if excellent_evaluations == 1:
+            evaluation_dict["boss_achievement"] = True
+            print(f'Boss Achievement:  {evaluation_dict["boss_achievement"]}')
+
         
     # Return the evaluation result to Skill Forge
-    return jsonify(evaluation.strip()), 201
+    return jsonify(evaluation_dict), 201
 
 # Update Challenge status to Failed
 @qst_bp.route('/update_challenge_fail', methods=['POST'])
@@ -151,3 +176,10 @@ def fail_challenge():
         return jsonify({"message": "Challenge Finished!"}), 201
     else:
         return jsonify({"error": "Challenge not found."}), 404
+
+
+# Validate if the user should receive an achievement for the challenge -- First time the user has completed a challenge with Excellent evaluation
+    # First Excellent evaluation for a challenge only
+@qst_bp.route('/give_achievement', methods=['GET'])
+def give_achievement():
+    return jsonify({"message": "Achievement Given!"}), 200
