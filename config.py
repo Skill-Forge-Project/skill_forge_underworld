@@ -9,8 +9,3 @@ class Config:
     SESSION_COOKIE_DOMAIN = False
     TIMEZONE = 'Europe/Sofia'
     PREFERRED_URL_SCHEME = 'https'
-
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = False  # Ensure cookies are sent over HTTPS
-    REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_SECURE = False  # Ensure remember me cookie is sent over HTTPS

@@ -1,6 +1,5 @@
-import re, ast
 from datetime import datetime
-from flask import Blueprint,  request, jsonify, redirect, url_for
+from flask import Blueprint,  request, jsonify
 from app.openai_client import client
 from app.models import Boss, Challenge, Evaluation
 

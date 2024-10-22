@@ -1,4 +1,4 @@
-import os, requests
+import os
 from flask import Blueprint, request, jsonify
 
 # Create a Blueprint for the main routes
