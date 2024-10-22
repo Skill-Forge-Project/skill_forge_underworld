@@ -136,7 +136,7 @@ def evaluate_user_answer():
         print(e)
         return jsonify({"error": f"Error: {e}"}), 500
     
-    # Add additional fields to the evaluation_dict
+    # Add additional fields to the evaluation_dict for the achievement system
     evaluation_dict["underworld_achievement"] = False
     evaluation_dict["boss_achievement"] = False
     evaluation_dict["user_id"] = user_id
@@ -171,10 +171,3 @@ def fail_challenge():
         return jsonify({"message": "Challenge Finished!"}), 201
     else:
         return jsonify({"error": "Challenge not found."}), 404
-
-
-# Validate if the user should receive an achievement for the challenge -- First time the user has completed a challenge with Excellent evaluation
-    # First Excellent evaluation for a challenge only
-@qst_bp.route('/give_achievement', methods=['GET'])
-def give_achievement():
-    return jsonify({"message": "Achievement Given!"}), 200
