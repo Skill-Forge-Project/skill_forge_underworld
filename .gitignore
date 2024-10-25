@@ -12,3 +12,6 @@
 
 # Ignore database migrations
 /migrations/
+
+# Ignore backup dependencies
+requirements-BACK.txt
