@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint,  request, jsonify
 from app.openai_client import client
 from app.models import Boss, Challenge, Evaluation
-
+from app import db
 
 # Create a Blueprint for the question routes
 qst_bp = Blueprint('question', __name__)
@@ -63,15 +63,17 @@ def check_active_challenge():
     user_id = data.get('user_id')
     boss_id = data.get('boss_id')
     
-    # Check if the user has an active challenge with the specific boss (today)
-    challenge = Challenge.query.filter_by(user_id=user_id, boss_id=boss_id).first()
+    # Get today's date at midnight
+    today = datetime.today().date()
     try:
-        if challenge.challenge_date.date() == datetime.now().date():
+        # Check if the user has an active challenge with the specific boss (today)
+        challenge = Challenge.query.filter_by(user_id=user_id, boss_id=boss_id).filter(db.func.date(Challenge.challenge_date) == today).first()
+        if challenge:
             return jsonify({"message": "Active Challenge Found!"}), 200
         else:
             return jsonify({"message": "No Active Challenge Found!"}), 404
     except AttributeError:
-        return jsonify({"message": "No Active Challenge Found!"}), 404
+        return jsonify({"error": "Error fetching active challenges!"}), 404
 
 # Evaluate user's answer
 @qst_bp.route('/evaluate_user_answer', methods=['POST'])
