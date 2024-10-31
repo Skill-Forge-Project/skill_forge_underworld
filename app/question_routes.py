@@ -107,7 +107,7 @@ def evaluate_user_answer():
     prompt += "Evaluate the user's answer. The user's answer should be evaluated based on the question you generated and must the one of the following - Poor, Satisfactory, Good, Excellent and must contain just one word of the specified."
     prompt += "Also, separatly give the user's a short feedback and make the feedback related to your own flair.It is very important that the feedback text string does not contain any special characters or single quotes."
     prompt += f"Give the user's XP points based on the your difficulty - {boss_difficulty} and on the evaluation of the user's answer."
-    prompt += "The XP points should be in the range of 0 to 100 for Easy, 101 to 250 for Medium, 251 to 500 for Hard."
+    prompt += "The XP points should be in the range of 0 to 100 for Easy, 0 to 250 for Medium, 0 to 500 for Hard."
     prompt += "All want to get the response in the following format: {'evaluation': <evaluation>, 'feedback': <feedback>, 'xp_points': <xp_points>}"
     
     response = client.chat.completions.create(model="gpt-4o",
