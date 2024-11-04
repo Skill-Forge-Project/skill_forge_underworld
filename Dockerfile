@@ -3,9 +3,9 @@ FROM python:3.12
 
 # Image Labels. Update values for each build
 LABEL Name="Skill-Forge Underworld"
-LABEL Version="1.0.0"
-LABEL Release="closed-beta"
-LABEL ReleaseDate="25.10.2024"
+LABEL Version="1.0.2"
+LABEL Release="public"
+LABEL ReleaseDate="01.11.2024"
 LABEL Description="Skill Forge Underworld is a Flask microservice that provides a API for the Skill Forge Underworld Realm."
 LABEL Maintainer="Aleksandar Karastoyanov <karastoqnov.alexadar@gmail.com>"
 LABEL License="GNU GPL v3.0 license"
