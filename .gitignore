@@ -1,17 +1,16 @@
-# Ignore python venv
-/skill_forge_underworld/
+# Ignore Python cache
+**/__pycache__/
 
-# Ignore Obsidian dir
-.obsidian/
+# Ignore config files and docs
+**.vscode/
+**.idea/
+**/docs/
+**/.ropeproject/
+**/migrations/
 
-# Ignore environment variables
-.env
+# Ignore Python virtual environments
+**/venv/
 
-# Ignore pycache
-**/__pycache__/**
-
-# Ignore database migrations
-/migrations/
-
-# Ignore backup dependencies
-requirements-BACK.txt
+# Ignore env variables
+**.env
+.DS_Store

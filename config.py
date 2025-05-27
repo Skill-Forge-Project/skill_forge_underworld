@@ -1,11 +1,11 @@
 import os
-from app.database_conn import SQL_URI
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = SQL_URI
-    TEMPLATES_AUTO_RELOAD = True
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SESSION_COOKIE_DOMAIN = False
-    TIMEZONE = 'Europe/Sofia'
-    PREFERRED_URL_SCHEME = 'https'
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
